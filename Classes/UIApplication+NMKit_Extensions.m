@@ -7,7 +7,7 @@
 //
 
 #import "UIApplication+NMKit_Extensions.h"
-//#import "NMKitDefines.h"
+#import "NMKitDefines.h"
 
 @implementation UIApplication (NMKit_Extensions)
 
