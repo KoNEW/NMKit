@@ -7,6 +7,7 @@
 //
 
 #import "UISegmentedControl+NMKit_Extensions.h"
+#import "NMKitDefines.h"
 
 @implementation UISegmentedControl (NMKit_Extensions)
 

@@ -7,6 +7,7 @@
 //
 
 #import "NSDateFormatter+NMKit_Extensions.h"
+#import "NSDate+NMKit_Extensions.h"
 
 @implementation NSDateFormatter (NMKit_Extensions)
 

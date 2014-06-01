@@ -7,6 +7,7 @@
 //
 
 #import "UIBarButtonItem+NMKit_Extensions.h"
+#import "NMKitDefines.h"
 
 @implementation UIBarButtonItem (NMKit_Extensions)
 

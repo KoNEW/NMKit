@@ -6,9 +6,10 @@
 //  Copyright (c) 2011 Novilab Mobile. All rights reserved.
 //
 
-#import "NSString+NMKit_Extenstion.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonHMAC.h>
+#import "NSString+NMKit_Extenstion.h"
+#import "NSData+NMKit_Extensions.h"
 
 NSString*   _deviceSuffix(void);
 NSString*   _stateSuffix(UIControlState controlState);

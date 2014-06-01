@@ -7,6 +7,7 @@
 //
 
 #import "UINavigationBar+NMKit_Extensions.h"
+#import "NMKitDefines.h"
 
 
 static  UIImage*    st_navigationBarBackgroundImagePortrait     =   nil;
