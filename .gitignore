@@ -1,0 +1,10 @@
+#Ignore Trash
+.DS_Store
+
+#Ignore User data
+xcuserdata
+
+#Ignore pods
+Project/NMKitExample.xcworkspace
+Project/Pods/
+Project/Podfile.lock
