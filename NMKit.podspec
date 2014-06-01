@@ -9,6 +9,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/KoNEW/NMKit.git", :tag => "0.0.4" }
   s.source_files = "Classes/**/*.{h,m}"
   s.public_header_files = "Classes/**/*.h"
+  s.resources    = "Classes/Resources/*"
   s.frameworks   = "Foundation", "UIKit"
   s.requires_arc = true
 end
