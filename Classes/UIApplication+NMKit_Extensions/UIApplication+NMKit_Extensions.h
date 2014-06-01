@@ -67,4 +67,8 @@
  */
 +   (void)  sendSMS:(NSString*)phoneNumber;
 
++   (NSURL*) applicationDocumentsFolderUrl;
+
++   (NSURL*) applicationDocumentsFolderUrlWithFileName:(NSString*)fileName;
+
 @end

@@ -40,4 +40,14 @@
     [UIApplication  openURL:url];
 }
 
++   (NSURL*) applicationDocumentsFolderUrl{
+    return [[[NSFileManager defaultManager]  URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask]   lastObject];
+}
+
++   (NSURL*) applicationDocumentsFolderUrlWithFileName:(NSString *)fileName{
+    NSURL* applicationFolder = [UIApplication applicationDocumentsFolderUrl];
+    
+    return [applicationFolder URLByAppendingPathComponent:fileName];
+}
+
 @end
