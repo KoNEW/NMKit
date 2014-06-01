@@ -7,8 +7,8 @@ Pod::Spec.new do |s|
   s.author       = { "KoNEW" => "konev.vn@gmail.com" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/KoNEW/NMKit.git", :tag => "0.0.4" }
-  s.source_files = "Classes/*.{h,m}"
-  s.public_header_files = "Classes/*.h"
-  s.framework    = "Foundation"
+  s.source_files = "Classes/**/*.{h,m}"
+  s.public_header_files = "Classes/**/*.h"
+  s.frameworks   = "Foundation", "UIKit"
   s.requires_arc = true
 end
