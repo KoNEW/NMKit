@@ -207,4 +207,16 @@
     return [[self   midNightTime]   isEqualToDate:[date midNightTime]];
 }
 
+- (NSDate*) midDay{
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    NSDateComponents* components = [calendar components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit)
+                                               fromDate:self];
+    [components setHour:12];
+    return [calendar dateFromComponents:components];
+}
+
++ (NSDate*) today{
+    return [[NSDate date] midDay];
+}
+
 @end

@@ -142,4 +142,8 @@ typedef NS_ENUM(NSUInteger, NMDateType){
 
 -   (BOOL)      isSimilarDay:(NSDate*)date;
 
+- (NSDate*) midDay;
++ (NSDate*) today;
+
+
 @end
