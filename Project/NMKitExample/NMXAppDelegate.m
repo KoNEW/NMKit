@@ -14,6 +14,15 @@
 {
     // Override point for customization after application launch.
     NMLog(@"%@", [UIApplication applicationDocumentsFolderUrlWithFileName:@"TestFile"]);
+    [NMURLRequest requestWithUrl:@"https://backend.aviashopper.com/mobile/cities/"
+                       andParams:nil
+                   andHttpMethod:kNMURLRequestHttpMethodPost
+                andParsingEngine:kNMURLRequestParsingEngineJSON
+                  andFinishBlock:^(id response) {
+                      NMLog(@"Response: %@", response);
+                  } andFailBlock:^(NSError *error) {
+                      NMLog(@"Failed: %@", error);
+                  }];
     return YES;
 }
 							

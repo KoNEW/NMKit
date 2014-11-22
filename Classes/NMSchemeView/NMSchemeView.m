@@ -533,7 +533,7 @@ const   NSInteger   kNMSchemeViewCurrentNoLayer =   -1;
         _headerView.title   =   [_dataSource    schemeView:self
                                      titleOfHeaderForLayer:_currentLayerIndex];
     else
-        _headerView.title   =   [NSString   stringWithFormat:@"Layer %d", _currentLayerIndex + 1];
+        _headerView.title   =   [NSString   stringWithFormat:@"Layer %ld", _currentLayerIndex + 1];
     
     if ([_delegate      respondsToSelector:@selector(schemeView:didSwitchToLayer:)])
         [_delegate  schemeView:self

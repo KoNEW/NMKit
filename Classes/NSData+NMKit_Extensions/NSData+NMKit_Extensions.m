@@ -7,12 +7,11 @@
 //
 
 #import "NSData+NMKit_Extensions.h"
-#import "Base64.h"
 
 @implementation NSData (NMKit_Extensions)
 
 -   (NSString*) hexValue{    
-    int length  =   [self length];
+    NSUInteger length  =   [self length];
     
     NSMutableString*        value   =   [[NSMutableString   alloc]  initWithCapacity:length*2];
     const   unsigned char*  buffer  =   (const unsigned char*)[self   bytes];
@@ -25,10 +24,6 @@
     
     
     return [NSString    stringWithString:value];
-}
-
--   (NSString*) base64Value{
-    return [Base64  encode:self];
 }
 
 @end

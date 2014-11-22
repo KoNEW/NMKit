@@ -52,8 +52,8 @@ NSString*   _stateSuffix(UIControlState controlState){
 -	(NSData*)	MD5{
 	const char*		data	=	[self	UTF8String];
 	unsigned char	hashingBuffer[CC_MD5_DIGEST_LENGTH];
-	
-	CC_MD5(data, strlen(data), hashingBuffer);
+
+    CC_MD5(data, (CC_LONG)strlen(data), hashingBuffer);
 	
 	return	[NSData	dataWithBytes:hashingBuffer
                           length:CC_MD5_DIGEST_LENGTH];
@@ -63,7 +63,7 @@ NSString*   _stateSuffix(UIControlState controlState){
 	const char*		data	=	[self	UTF8String];
 	unsigned char	hashingBuffer[CC_SHA1_DIGEST_LENGTH];
 	
-	CC_SHA1(data, strlen(data), hashingBuffer);
+	CC_SHA1(data, (CC_LONG)strlen(data), hashingBuffer);
 	
 	return	[NSData	dataWithBytes:hashingBuffer
                           length:CC_SHA1_DIGEST_LENGTH];
@@ -94,22 +94,22 @@ NSString*   _stateSuffix(UIControlState controlState){
 #pragma mark - Hash Base64
     //Get hash of NSString with MD5 algorithm and return Base64 interpretation
 -   (NSString*) MD5_x64{
-    return [[self   MD5]    base64Value];
+    return [[self MD5] base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
 }
 
     //Get hash of NSString with SHA1 algorithm and return Base64 interpretation
 -   (NSString*) SHA1_x64{
-    return [[self   SHA1]   base64Value];
+    return [[self   SHA1]   base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
 }
 
     //Get hash of NSString with MD5 algorithm, HMAC postprocessing and return Base64 interpretation
 -   (NSString*) HMAC_MD5_x64:(NSString *)hmacKey{
-    return [[self HMAC_MD5:hmacKey] base64Value];
+    return [[self HMAC_MD5:hmacKey] base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
 }
 
     //Get hash of NSString with SHA1 algorithm, HMAC postprocessing and return Base64 interpretation
 -   (NSString*) HMAC_SHA1_x64:(NSString *)hmacKey{
-    return [[self   HMAC_SHA1:hmacKey]  base64Value];
+    return [[self   HMAC_SHA1:hmacKey]  base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
 }
 
 #pragma mark - Hash HEX

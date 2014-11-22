@@ -19,12 +19,4 @@
  */
 -   (NSString*) hexValue __attribute__((const, availability(ios, introduced=2.0)));
 
-/**
- Интерпретация в Base64
- Все данные интепретируются как Base64 строка.
- @return Возвращает интерпретацию данных как Base64 строки
- @since Available in iOS 2.0 and later
- */
--   (NSString*) base64Value __attribute__((const, availability(ios, introduced=2.0)));;
-
 @end

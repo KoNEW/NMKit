@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 
 
-#define kNMURLRequestHttpMethodPost             @"POST"
-#define kNMURLRequestHttpMethodGet              @"GET"
+extern NSString* kNMURLRequestHttpMethodPost;
+extern NSString* kNMURLRequestHttpMethodGet;
+extern NSString* kNMURLRequestHttpMethodPut;
+extern NSString* kNMURLRequestHttpMethodDelete;
 
-#define kNMURLRequestParsingEngineRawData       @"NMURLRequest_parse_response_as_NSData"
-#define kNMUrlRequestParsingEngineString        @"NMURLRequest_parse_response_as_NSString"
-#define kNMURLRequestParsingEngineSBJSON        @"NMURLRequest_parse_response_with_SBJSON_engine"
+extern NSString* kNMURLRequestParsingEngineRawData;
+extern NSString* kNMURLRequestParsingEngineString;
+extern NSString* kNMURLRequestParsingEngineJSON;
 
-#define kNMURLRequestConnectionTypeAsync        @"NMURLRequest_asynchronous_connection"
-#define kNMURLRequestConnectionTypeSync         @"NMURLRequest_synchronous_connection"
+extern NSString* kNMURLRequestConnectionTypeAsync;
+extern NSString* kNMURLRequestConnectionTypeSync;
 
     //ERROR Constants
 #define kNMURLRequestErrorDomain                @"ru.novilab-mobile.nmurlrequest.error"
@@ -51,30 +53,6 @@
                          andFailBlock:failBlock]; 
         ..
     }
-
-
- Вариант работы с делегатом:
-     -  (void)  someMethod{
-        ..
-        NSString*   host    =   @"http://www.example.com";
-
-        [NMURLRequest   requestWithDelegate:self
-                                     andUrl:host
-                                  andParams:@{@"username" : @"KoNEW", @"password" : @"pass"}
-                              andHttpMethod:kNMURLRequestHttpMethodGet
-                           andParsingEngine:kNMURLRequestParsingEngineSBJSON]
-        ..
-     }
- 
-     -   (void)  urlRequest:(NMURLRequest *)urlRequest
-           didFailWithError:(NSError *)error{
-        NMLog(@"Sync request failed with error: %@", error);
-     }
-     
-     -   (void)  urlRequest:(NMURLRequest *)urlRequest
-         didReceiveResponse:(id)response{
-        NMLog(@"Finished with response: %@", response);
-     }
  
  ###БЛОКИ###
  
@@ -108,8 +86,6 @@
      #define kNMURLRequestParsingEngineSBJSON        @"NMURLRequest_parse_response_with_SBJSON_engine"
  */
 
-@protocol NMURLRequestDelegate;
-
 typedef void (^NMURLRequestFinishBlock)(id response);
 typedef void (^NMURLRequestFailBlock)(NSError*  error);
 typedef void (^NMURLRequestFinalizeBlock)(void);
@@ -122,7 +98,6 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
 /** @name Свойства */
 /**
  Запрашиваемый URL адрес.
- @since Available in iOS 4.0 and later
  */
 
 @property(nonatomic, copy)      NSString*       url;
@@ -133,7 +108,6 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  
  - При GET запросе может принимать в качестве значений словаря также только экземпляры `NSString`, `NSNumber`, все прочие значения игнорируются.
  - При POST запроса словарь может включать в себя также экземпляры `NSData`, `UIImage`. Все прочие значения игнорируются.
- @since Available in iOS 4.0 and later
  */
 @property(nonatomic, strong)    NSDictionary*   params;
 
@@ -146,22 +120,8 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  
  - `kNMURLRequestHttpMethodGet` - GET запроса
  - `kNMURLRequestHttpMethodPost` - POST запроса
- 
- @since Available in iOS 4.0 and later
  */
-@property(nonatomic,
-          strong,   
-          setter = setHttpMethod:)      NSString*       httpMethod;
-
-/**
- Делегат исполнения запроса
- 
- Объект делегата должен соответствовать протоколу NMURLRequestDelegate
- @see   NMURLRequestDelegate
- 
- @since Available in iOS 4.0 and later
- */
-@property(nonatomic, unsafe_unretained) id<NMURLRequestDelegate> delegate;
+@property(nonatomic, strong, setter = setHttpMethod:)      NSString*       httpMethod;
 
 /**
  Метод разбора данных запроса.
@@ -171,8 +131,6 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  - `kNMURLRequestParsingEngineRawData` - вернуть "сырые данные", возвращаемый делегатом объект является экземпляром класса NSData
  - `kNMUrlRequestParsingEngineString` - проинтерпретировать сырые данные в виде строки в кодировке UTF8, возвращаемый делегатом объект является экземпляром класса `NSString`
  - `kNMURLRequestParsingEngineSBJSON` - проинтерпретировать сырые данные в виде JSON объекта, возвращаемый делегатом объект является в зависимости от вида верхнеуровневого JSON объекта либо экземпляром `NSArray`, либо `NSDictionary`
- 
- @since Available since iOS 4.0 and later
  */
 @property(nonatomic, strong)    NSString*       parsingEngine;
 
@@ -185,146 +143,18 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  
  - `kNMURLRequestConnectionTypeAsync` - асинхронное выполнение запроса
  - `kNMURLRequestConnectionTypeSync`- синхронное выполнение запроса
- @since Available since iOS 4.0 and later
  */
 @property(nonatomic, strong)    NSString*       connectionType;
 
 
 /** @name   Конструкторы */
-/**
+/** 
  Тривиальный конструктор.
- 
- Возвращает экземпляр класса с параметрами по умолчанию, то есть: `url=nil`, `delegate=nil`,`params=nil`.
- @since Available in iOS 4.0
+ Возвращает экземпляр класса с параметрами по умолчанию, то есть: `url=nil`,`params=nil`.
  @return Проинициализированный экземпляр класса `NMURLRequest`
  */
--   (NMURLRequest*) init;
+-   (instancetype) init;
 
-/**
- Возвращает экземпляр класса с заданными параметрами `url, delegate, params`.
- 
- По умолчанию данные запрос отправляется методом GET (`kNMURLRequestHttpMethodGet`), а результат интепретируется как сырые данные (`kNMURLRequestParsingEngineRawData`).
- 
- @param url Запрашиваемый URL адрес 
- @param delegate Объект делегата, который будет уведомлен после выполнения запроса
- @param params Словарь с параметрами запроса
- @since Available since iOS 4.0 and later
- @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`
- @see url, delegate, params
- */
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString*)url
-                           andParams:(NSDictionary*)params;
-
-/**
- Возвращает экземпляр класса с заданными параметрами `url, delegate, params, httpMethod`.
- 
- По умолчанию результат выполнения запроса интерпретируется как сырые данные (`kNMURLRequestParsingEngineRawData`).
- 
- @param url Запрашиваемый URL адрес
- @param delegate Объект делегата, который будет уведомлен после выполнения запроса
- @param params Словарь с параметрами запроса
- @param httpMethod Метод выполнения запроса
- @since Available since iOS 4.0 and later
- @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`
- @see url, delegate, params, httpMethod
- */
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString *)url
-                           andParams:(NSDictionary *)params
-                       andHttpMethod:(NSString*)httpMethod;
-
-/**
- Возвращает экземпляр класса с заданными параметрами `url, delegate, params, httpMethod, parsingEngine`.
- 
- @param url Запрашиваемый URL адрес
- @param delegate Объект делегата, который будет уведомлен после выполнения запроса
- @param params Словарь с параметрами запроса
- @param httpMethod Метод выполнения запроса
- @param parsingEngine Используемый для разбора данных движок
- @since Available since iOS 4.0 and later
- @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`
- @see url, delegate, params, httpMethod, parsingEngine
- */
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString*)url
-                           andParams:(NSDictionary*)params
-                       andHttpMethod:(NSString*)httpMethod
-                    andParsingEngine:(NSString*)parsingEngine;
-
-/** @name   Статические конструкторы */
-/**
- Возвращает экземпляр класса с заданными параметрами `url, delegate, params, httpMethod`.
- 
- Создаваемый экземпляр класса при этом автоматически отправляется в очередь запросов.
- 
- По умолчанию результат выполнения запроса интерпретируется как сырые данные (`kNMURLRequestParsingEngineRawData`).
- 
- @param url Запрашиваемый URL адрес
- @param delegate Объект делегата, который будет уведомлен после выполнения запроса
- @param params Словарь с параметрами запроса
- @param httpMethod Метод выполнения запроса
- @since Available since iOS 4.0 and later
- @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`.
- @see url, delegate, params, httpMethod
- */
-+   (NMURLRequest*) requestWithDelegate:(id<NMURLRequestDelegate>)delegate
-                                 andUrl:(NSString*)url
-                              andParams:(NSDictionary*)params
-                          andHttpMethod:(NSString*)httpMethod;
-
-/**
- Возвращает экземпляр класса с заданными параметрами `url, delegate, params, httpMethod, parsingEngine`.
- 
- Создаваемый экземпляр класса при этом автоматически отправляется в очередь запросов.
- 
- По умолчанию результат выполнения запроса интерпретируется как сырые данные (`kNMURLRequestParsingEngineRawData`).
- 
- @param url Запрашиваемый URL адрес
- @param delegate Объект делегата, который будет уведомлен после выполнения запроса
- @param params Словарь с параметрами запроса
- @param httpMethod Метод выполнения запроса
- @param parsingEngine Используемый для разбора данных движок
- @since Available since iOS 4.0 and later
- @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`.
- @see url, delegate, params, httpMethod
- */
-+   (NMURLRequest*) requestWithDelegate:(id<NMURLRequestDelegate>)delegate
-                                 andUrl:(NSString*)url
-                              andParams:(NSDictionary*)params
-                          andHttpMethod:(NSString*)httpMethod
-                       andParsingEngine:(NSString*)parsingEngine;
-
-    /// @name Методы экземпляра
-/**
- Остановка запроса
- 
- Обраывается исполнение текущего запроса. Внутренний запрос и скачанные данные обнуляются.
- 
- @see   start
- @since Available since iOS 4.0 and later
- */
--   (void)  cancel;
-
-/**
- Запуск запроса
- 
- Начинает исполнение запроса к указанному URL адресу с заданными параметрами. Если в момент запуска запрос находится в активном состоянии, он обрывается вызовом метода cancel.
- @see   cancel
- @since Available since iOS 4.0 and later
- */
--   (void)  start;
-
-/**
- Разрыв запроса.
- 
- Останавливается исполнение текущего запроса и устанавливает делегат в `nil`, а также обнуляет блоки finish, fail.
- @see   cancel, delegate
- @since Available since iOS 4.0 and later
- */
--   (void)  invalidate;
-
-    ///@name Работа с блоками
 /**
  Возвращает экземпляр класса с заданными параметрами `url, params, httpMethod, parsingEngine, finishBlock, failBlock`.
  
@@ -340,7 +170,7 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`.
  @see url, params, httpMethod, parsingEngine, setFinishBlock, setFailBlock
  */
--   (NMURLRequest*) initWithUrl:(NSString*)url
+-   (instancetype) initWithUrl:(NSString*)url
                       andParams:(NSDictionary*)params
                   andHttpMethod:(NSString*)httpMethod
                andParsingEngine:(NSString*)parsingEngine
@@ -349,7 +179,6 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
 
 /**
  Возвращает экземпляр класса с заданными параметрами `url, params, httpMethod, parsingEngine, finishBlock, failBlock, connectionType`.
- 
  @param url Запрашиваемый URL адрес
  @param params Словарь с параметрами запроса
  @param httpMethod Метод выполнения запроса
@@ -361,7 +190,7 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`.
  @see url, params, httpMethod, parsingEngine, connectionType, setFinishBlock, setFailBlock
  */
--   (NMURLRequest*) initWithUrl:(NSString*)url
+-   (instancetype) initWithUrl:(NSString*)url
                       andParams:(NSDictionary*)params
                   andHttpMethod:(NSString*)httpMethod
                andParsingEngine:(NSString*)parsingEngine
@@ -384,7 +213,7 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  @return Проинициализированный с заданными параметрами экемпляр класса `NMURLRequest`.
  @see url, params, httpMethod, parsingEngine, setFinishBlock, setFailBlock
  */
-+   (NMURLRequest*) requestWithUrl:(NSString*)url
++   (instancetype) requestWithUrl:(NSString*)url
                          andParams:(NSDictionary*)params
                      andHttpMethod:(NSString*)httpMethod
                   andParsingEngine:(NSString*)parsingEngine
@@ -407,13 +236,34 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
  @see url, params, httpMethod, parsingEngine,connectionType, setFinishBlock, setFailBlock
  @param connectionType Режим выполнения запроса, синхронный или асинхронный
  */
-+   (NMURLRequest*) requestWithUrl:(NSString*)url
++   (instancetype) requestWithUrl:(NSString*)url
                          andParams:(NSDictionary*)params
                      andHttpMethod:(NSString*)httpMethod
                   andParsingEngine:(NSString*)parsingEngine
                     andFinishBlock:(NMURLRequestFinishBlock)finishBlock
                       andFailBlock:(NMURLRequestFailBlock)failBlock
                  andConnectionType:(NSString*)connectionType;
+
+    /// @name Методы экземпляра
+/**
+ Остановка запроса
+ 
+ Обраывается исполнение текущего запроса. Внутренний запрос и скачанные данные обнуляются.
+ 
+ @see   start
+ @since Available since iOS 4.0 and later
+ */
+-   (void)  cancel;
+
+/**
+ Запуск запроса
+ 
+ Начинает исполнение запроса к указанному URL адресу с заданными параметрами. Если в момент запуска запрос находится в активном состоянии, он обрывается вызовом метода cancel.
+ @see   cancel
+ @since Available since iOS 4.0 and later
+ */
+-   (void)  start;
+
 
 /**
  Блок удачного исполнения кода
@@ -456,37 +306,3 @@ typedef void (^NMURLRequestDownloadProgressBlock)(long long bytesReceived, long 
 -   (void)  setDownloadProgressBlock:(NMURLRequestDownloadProgressBlock)downloadProgressBlock;
 
 @end
-
-@protocol NMURLRequestDelegate <NSObject>
-
-/**
- Протокол для обработки запросов к сети классом NMURLRequest
- */
-
-@optional
-/**
- Успешное завершение запроса
- 
- Вызывается при успешном завершении запроса.
- @param urlRequest Экземпляр `NMURLRequest`, вызвавший данный метод протокола.
- @param response Полученный в результате выполнения запроса ответ. В зависимости от `parsingEngine` может быть указателями на экземпляры классов `NSData, NSString, NSArray, NSDictionary`
- @since Available since iOS 4.0 and later
- */
--   (void)  urlRequest:(NMURLRequest*)urlRequest    
-    didReceiveResponse:(id)response;
-
-/**
- Завершение запроса с ошибкой
- 
- Вызывается в случае если при исполнении запроса возникла какая-либо ошибка.
- @param urlRequest Экземпляр `NMURLRequest`, вызвавший данный метод протокола.
- @param error Экземпляр класса `NSError` с подробным описанием возникшей ошибки
- @since Available since iOS 4.0 and later
- */
--   (void)  urlRequest:(NMURLRequest*)urlRequest    
-      didFailWithError:(NSError*)error;
-
-@end
-
-
-

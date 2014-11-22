@@ -30,22 +30,12 @@ NMKit - это библиотека классов и расширений на 
 #import "NMKitDefines.h"
 #import "NSString+NMKit_Extenstion.h"
 #import "NMActivityIndicatorView.h"
-#import "NMPhotoViewer.h"
-#import "UIImage+NMKit_Extensions.h"
 #import "NMURLRequest.h"
-#import "UIToolbar+NMKit_Extensions.h"
-#import "UINavigationBar+NMKit_Extensions.h"
-#import "UIBarButtonItem+NMKit_Extensions.h"
 #import "UIApplication+NMKit_Extensions.h"
 #import "NSData+NMKit_Extensions.h"
-#import "UISegmentedControl+NMKit_Extensions.h"
 #import "NSDate+NMKit_Extensions.h"
 #import "NSDateFormatter+NMKit_Extensions.h"
 #import "NMApplicationBannerView.h"
 #import "NMSegmentedController.h"
 #import "NMSchemeView.h"
 #import "NMTimeMetrics.h"
-#import "NMCGHelps.h"
-
-
-

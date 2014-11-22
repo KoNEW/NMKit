@@ -362,7 +362,7 @@ static  NMSegmentedControllerTransitionBlock    st_transitionBlockDissolve;
     
     NSUInteger  childIndex  =   [_viewControllers   indexOfObject:childController];
     if (childIndex  !=  NSNotFound)
-        result  =   [NSString   stringWithFormat:@"Item %d", childIndex + 1];
+        result  =   [NSString   stringWithFormat:@"Item %lu", childIndex + 1];
     
     return result;
 }
@@ -411,20 +411,20 @@ static  NMSegmentedControllerTransitionBlock    st_transitionBlockDissolve;
     
     if (isValid){
         if (fromIndex   <   toIndex){
-            for (int i = fromIndex; i <= toIndex; i++){
+            for (NSInteger i = fromIndex; i <= toIndex; i++){
                 UIViewController*   vc  =   [self   childViewControllerAtIndex:i];
                 if (vc  !=  nil)
                     [array  addObject:vc];
             }
         }else{
-            for (int i = fromIndex; i >= toIndex; i--) {
+            for (NSInteger i = fromIndex; i >= toIndex; i--) {
                 UIViewController*   vc  =   [self   childViewControllerAtIndex:i];
                 if (vc  !=  nil)
                     [array  addObject:vc];
             }
         }
     }else
-        NMLog(@"Construct view controllers chain failed with invalid indexes:\n\tFROM: %d\n\tTO: %d\n\tTOTAL VC COUNT: %d", fromIndex, toIndex, _viewControllers.count);
+        NMLog(@"Construct view controllers chain failed with invalid indexes:\n\tFROM: %ld\n\tTO: %ld\n\tTOTAL VC COUNT: %ld", (long)fromIndex, (long)toIndex, _viewControllers.count);
     
     return [NSArray arrayWithArray:array];
 }

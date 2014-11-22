@@ -7,25 +7,46 @@
 //
 
 #import "NMURLRequest.h"
-#import "NMURLRequest_internal.h"
-
 #import "NSString+NMKit_Extenstion.h"
-#import "JSON.h"
+
+
+NSString * kNMURLRequestHttpMethodPost = @"POST";
+NSString * kNMURLRequestHttpMethodGet = @"GET";
+NSString * kNMURLRequestHttpMethodPut = @"PUT";
+NSString * kNMURLRequestHttpMethodDelete = @"DELETE";
+
+NSString * kNMURLRequestParsingEngineRawData = @"NMURLRequest_parse_response_as_NSData";
+NSString * kNMURLRequestParsingEngineString = @"NMURLRequest_parse_response_as_NSString";
+NSString * kNMURLRequestParsingEngineJSON = @"NMURLRequest_parse_response_as_JSON";
+
+
+NSString * kNMURLRequestConnectionTypeAsync = @"NMURLRequest_asynchronous_connection";
+NSString * kNMURLRequestConnectionTypeSync = @"NMURLRequest_synchronous_connection";
+
 
 
 @interface NMURLRequest (){
-    long long           _expectedContentLength;
-    NSMutableData*      _data;
-    NSURLConnection*    _connection;
+    long long _expectedContentLength;
+    NSMutableData* _data;
+    NSURLConnection* _connection;
     
-    id<NMURLRequestDelegate>    __unsafe_unretained _delegate;
-    
-    NMURLRequestFinishBlock             _finishBlock;
-    NMURLRequestFailBlock               _failBlock;
-    NMURLRequestFinalizeBlock           _finalizeBlock;
-    NMURLRequestUploadProgressBlock     _uploadProgressBlock;
-    NMURLRequestDownloadProgressBlock   _downloadProgressBlock;
+    NMURLRequestFinishBlock _finishBlock;
+    NMURLRequestFailBlock _failBlock;
+    NMURLRequestFinalizeBlock _finalizeBlock;
+    NMURLRequestUploadProgressBlock _uploadProgressBlock;
+    NMURLRequestDownloadProgressBlock _downloadProgressBlock;
 }
+
+
+-   (NSMutableURLRequest*)  preparePostRequest;
+-   (NSMutableURLRequest*)  prepareGetRequest;
+-   (NSString*)             getRandomBoundary;
+-   (NSError*)              prepareErrorWithDomain:(NSString*)errorDomain
+                                      andErrorCode:(NSInteger)errorCode
+                                        andMessage:(NSString*)errorMessage;
+
+-   (NSString*) parseResponseAsStringWithError:(NSError**)error;
+-   (id)        parseResponseAsJSONWithError:(NSError**)error;
 
 @end
 
@@ -37,7 +58,7 @@
     [_connection    cancel];
 }
 
--   (NMURLRequest*) initWithUrl:(NSString *)url
+-   (instancetype) initWithUrl:(NSString *)url
                       andParams:(NSDictionary *)params
                   andHttpMethod:(NSString *)httpMethod
                andParsingEngine:(NSString *)parsingEngine
@@ -55,7 +76,7 @@
     return self;
 }
 
--   (NMURLRequest*) initWithUrl:(NSString *)url
+-   (instancetype) initWithUrl:(NSString *)url
                       andParams:(NSDictionary *)params
                   andHttpMethod:(NSString *)httpMethod
                andParsingEngine:(NSString *)parsingEngine
@@ -63,22 +84,22 @@
                    andFailBlock:(NMURLRequestFailBlock)failBlock
               andConnectionType:(NSString *)connectionType {
     
-    self    =   [self   initWithDelegate:nil
-                                  andUrl:url
-                               andParams:params
-                           andHttpMethod:httpMethod
-                        andParsingEngine:parsingEngine];
+    self = [super init];
     
     if (self){
-        [self   setFinishBlock:finishBlock];
-        [self   setFailBlock:failBlock];
-        [self   setConnectionType:connectionType];
+        self.url = url;
+        self.params = params;
+        self.httpMethod = httpMethod;
+        self.parsingEngine = parsingEngine;
+        self.finishBlock = finishBlock;
+        self.failBlock = failBlock;
+        self.connectionType = connectionType;
     }
     
     return self;
 }
 
-+   (NMURLRequest*) requestWithUrl:(NSString *)url
++   (instancetype) requestWithUrl:(NSString *)url
                          andParams:(NSDictionary *)params
                      andHttpMethod:(NSString *)httpMethod
                   andParsingEngine:(NSString *)parsingEngine
@@ -98,7 +119,7 @@
     }
 }
 
-+   (NMURLRequest*) requestWithUrl:(NSString *)url
++   (instancetype) requestWithUrl:(NSString *)url
                          andParams:(NSDictionary *)params
                      andHttpMethod:(NSString *)httpMethod
                   andParsingEngine:(NSString *)parsingEngine
@@ -120,81 +141,12 @@
     }
 }
 
-+   (NMURLRequest*) requestWithDelegate:(id<NMURLRequestDelegate>)delegate 
-                                 andUrl:(NSString *)url 
-                              andParams:(NSDictionary *)params 
-                          andHttpMethod:(NSString *)method 
-                       andParsingEngine:(NSString *)parsingEngine{
-    @autoreleasepool {
-        NMURLRequest*   request =   [[NMURLRequest  alloc]  initWithDelegate:delegate
-                                                                      andUrl:url
-                                                                   andParams:params
-                                                               andHttpMethod:method
-                                                            andParsingEngine:parsingEngine];
-        
-        [request        start];
-        
-        return request;
-    }
-}
-
-+   (NMURLRequest*) requestWithDelegate:(id<NMURLRequestDelegate>)delegate
-                                 andUrl:(NSString *)url
-                              andParams:(NSDictionary *)params
-                          andHttpMethod:(NSString *)httpMethod{
-    return [NMURLRequest    requestWithDelegate:delegate
-                                         andUrl:url
-                                      andParams:params
-                                  andHttpMethod:httpMethod
-                               andParsingEngine:kNMURLRequestParsingEngineRawData];
-}
-
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString *)url
-                           andParams:(NSDictionary *)params
-                       andHttpMethod:(NSString *)httpMethod
-                    andParsingEngine:(NSString *)parsingEngine{
-    self    =   [super  init];
-    
-    if (self){
-        [self   setUrl:url];
-        [self   setDelegate:delegate];
-        [self   setParams:params];
-        [self   setHttpMethod:httpMethod];
-        [self   setParsingEngine:parsingEngine];
-        [self   setConnectionType:kNMURLRequestConnectionTypeAsync];
-    }
-    
-    return self;    
-}
-
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString *)url
-                           andParams:(NSDictionary *)params
-                       andHttpMethod:(NSString *)httpMethod{
-    
-    return [self    initWithDelegate:delegate
-                              andUrl:url
-                           andParams:params
-                       andHttpMethod:httpMethod
-                    andParsingEngine:kNMURLRequestParsingEngineRawData];
-}
-
--   (NMURLRequest*) initWithDelegate:(id<NMURLRequestDelegate>)delegate
-                              andUrl:(NSString *)url
-                           andParams:(NSDictionary *)params{
-    return [self    initWithDelegate:delegate
-                              andUrl:url
-                           andParams:params
-                       andHttpMethod:kNMURLRequestHttpMethodGet];
+- (instancetype) init{
+    return nil;
 }
 
 #pragma mark    -   LifeCycle
--   (NMURLRequest*) init{
-    return [self    initWithDelegate:nil
-                              andUrl:nil
-                           andParams:nil];
-}
+
 
 -   (void)  start{
     [self   cancel];
@@ -218,7 +170,8 @@
 
         NSURLResponse*  response    =   nil;
         NSError*        error       =   nil;
-        _data   =   [NSMutableData  dataWithData:[NSURLConnection    sendSynchronousRequest:request returningResponse:&response error:&error]];
+        _data   =   [NSMutableData  dataWithData:[NSURLConnection    sendSynchronousRequest:request
+                                                                          returningResponse:&response error:&error]];
         
         if (_data) {
             [self   connectionDidFinishLoading:nil];
@@ -233,18 +186,7 @@
 -   (void)  cancel{
     [_connection    cancel];
     _connection =   nil;
-    
     _data       =   nil;
-}
-
--   (void)  invalidate{
-    [self   setDelegate:nil];
-    [self   setFinishBlock:NULL];
-    [self   setFailBlock:NULL];
-    [self   setFinalizeBlock:NULL];
-    [self   setUploadProgressBlock:NULL];
-    [self   setDownloadProgressBlock:NULL];
-    [self   cancel];
 }
 
 #pragma mark    -   Blocks
@@ -383,32 +325,23 @@
 }
 
 #pragma mark    -   NMURLRequestParserEngines
-
 -   (NSString*) parseResponseAsStringWithError:(NSError **)error{
     NSString*   result  =   [[NSString  alloc]  initWithData:_data
                                                     encoding:NSUTF8StringEncoding];
     
-    
     return result;
 }
 
--   (id)    parseResponseAsSBJsonWithError:(NSError **)error{
-    SBJsonParser*   parser  =   [[SBJsonParser  alloc]  init];
+-   (id)    parseResponseAsJSONWithError:(NSError **)error{
+    id result = [NSJSONSerialization JSONObjectWithData:_data
+                                                options:0
+                                                  error:error];
     
-    NSString*       jsonString  =   [self   parseResponseAsStringWithError:error];
-    
-    if (*error   !=  nil)
-        NMLog(@"NMURLRequest. SBJSON parser failed on try to convert NSData to String representation");
-    else{
-        id response =   [parser objectWithString:jsonString
-                                           error:error];
-        if (*error   !=  nil)
-            NMLog(@"NMURLRequest, SBJSON parser failed to convert NSString to JSON representation");
-        else
-            return response;
+    if (*error != nil){
+        NMLog(@"NMURLRequest. JSON parser failed with reason: %@", *error);
     }
     
-    return nil;    
+    return result;
 }
 
 
@@ -419,12 +352,12 @@
     _expectedContentLength  =   response.expectedContentLength;
 }
 
--   (void)  connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{
+-   (void)  connection:(NSURLConnection *)connection
+        didReceiveData:(NSData *)data{
     if (_data   ==  nil)
         _data   =   [[NSMutableData alloc]  init];
     
     [_data  appendData:data];
-    
     
     if (_expectedContentLength !=  NSURLResponseUnknownLength  &&
         _expectedContentLength >  0 &&
@@ -436,10 +369,8 @@
     }
 }
 
--   (void)  connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{    
-    if ([_delegate  respondsToSelector:@selector(urlRequest:didFailWithError:)])
-        [_delegate  urlRequest:self didFailWithError:error];
-    
+-   (void)  connection:(NSURLConnection *)connection
+      didFailWithError:(NSError *)error{
     if (_failBlock  !=  NULL)
         _failBlock(error);
     
@@ -462,10 +393,10 @@
     id  response    =   nil;
     if ([_parsingEngine isEqualToString:kNMURLRequestParsingEngineRawData])
         response    =   _data;
-    else if ([_parsingEngine    isEqualToString:kNMUrlRequestParsingEngineString])
+    else if ([_parsingEngine    isEqualToString:kNMURLRequestParsingEngineString])
         response    =   [self   parseResponseAsStringWithError:&error];
-    else if ([_parsingEngine    isEqualToString:kNMURLRequestParsingEngineSBJSON])
-        response    =   [self   parseResponseAsSBJsonWithError:&error];
+    else if ([_parsingEngine    isEqualToString:kNMURLRequestParsingEngineJSON])
+        response = [self parseResponseAsJSONWithError:&error];
     else
         error       =   [self   prepareErrorWithDomain:kNMURLRequestErrorDomain
                                           andErrorCode:kNMURLRequestErrorDefaultCode
@@ -476,10 +407,6 @@
           didFailWithError:error];
         return;
     }else{
-        if ([_delegate  respondsToSelector:@selector(urlRequest:didReceiveResponse:)])
-            [_delegate  urlRequest:self
-                didReceiveResponse:response];
-        
         if (_finishBlock    !=  NULL)
             _finishBlock(response);
         
@@ -502,7 +429,6 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite{
 /// SSL METHODS
 
 -   (BOOL)  connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
-    
     return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
 }
 

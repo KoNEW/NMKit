@@ -9,7 +9,6 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "Base64.h"
 
 #import "NMKitDefines.h"
 
