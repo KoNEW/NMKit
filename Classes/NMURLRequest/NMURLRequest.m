@@ -273,7 +273,7 @@ NSString * kNMURLRequestConnectionTypeSync = @"NMURLRequest_synchronous_connecti
     [httpBody   appendData:[[NSString   stringWithFormat:@"\r\n--%@--\r\n", boundary]   dataUsingEncoding:NSUTF8StringEncoding]];
     [request    setHTTPBody:httpBody];
     
-    [request    setValue:[NSString stringWithFormat:@"%i", [request.HTTPBody length]]
+    [request    setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[request.HTTPBody length]]
       forHTTPHeaderField:@"Content-Length"];
     
     return request;
